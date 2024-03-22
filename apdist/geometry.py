@@ -1,10 +1,6 @@
 import numpy as np
-from scipy import linalg
-import optimum_reparamN2 as orN2
 from scipy.interpolate import UnivariateSpline, interp1d
 from scipy.integrate import cumtrapz
-from collections import namedtuple
-import time, os, traceback, shutil, warnings
 
 class SquareRootSlopeFramework:
     """Square Root Slope Framework (SRSF)
@@ -107,7 +103,7 @@ class SquareRootSlopeFramework:
 
         return q_temp
         
-    def get_gamma(self, q1, q2, lam=0.0, grid_dim=7):
+    def get_gamma(self, q1, q2, **kwargs):
         """Compute warping function given two SRSFs
         
         Parameters:
@@ -116,8 +112,7 @@ class SquareRootSlopeFramework:
                 Discrete SRSF evaluation of pair of functions 
             lam : float
                 Regularization parameter of Dynamic Programming algorithm
-            grid_dim : int
-                Number of nearest grid points to search for
+
                 
         Returns:
         ========
@@ -128,13 +123,30 @@ class SquareRootSlopeFramework:
         This function is a heavylift from the python 'fdasrsf' package.
         See https://github.com/jdtuck/fdasrsf_python for more details.       
         """ 
-        gamma = orN2.coptimum_reparam(np.ascontiguousarray(q1), 
-                                      self.time,
-                                      np.ascontiguousarray(q2), 
-                                      lam, 
-                                      grid_dim
-                                     )
-        
+        optim = kwargs.pop("optim", "DP")
+        if optim== "DP":
+            import optimum_reparamN2 as orN2
+
+            gamma = orN2.coptimum_reparam(np.ascontiguousarray(q1), 
+                                        self.time,
+                                        np.ascontiguousarray(q2), 
+                                        kwargs.pop("lambda", 0.0),
+                                        kwargs.pop("grid_dim", 7)
+                                        )
+        elif optim=="RLBFGS":
+            from .optim import rlbfgs
+
+            optimizer = rlbfgs(q1,self.time,q2)
+            default_kwargs = {"maxiter":30, 
+                              "verb":2, 
+                              "lam": 0, 
+                              "penalty": "roughness"
+                              }
+            default_kwargs.update(kwargs)
+            optimizer.solve(**default_kwargs)
+
+            gamma = optimizer.gammaOpt
+            
         return gamma
 
 class WarpingManifold:
@@ -206,7 +218,7 @@ class WarpingManifold:
         if gam.ndim > 1:
             T, n = gam.shape
         else:
-            return gamma_inverse(gam)
+            return self.inverse(gam)
 
         psi = np.zeros_like(gam)
         for k in range(0, n):
