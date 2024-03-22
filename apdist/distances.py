@@ -1,6 +1,7 @@
 import numpy as np
 
 from .geometry import *
+import pdb 
 
 def _grad(f, binsize):
     n = f.shape[0]
@@ -71,12 +72,7 @@ def _phase_distance(time, q1, q2, gam):
         M = len(time)
         gam_dev = _grad(gam, 1 / np.double(M - 1))
         theta = np.trapz(np.sqrt(gam_dev),x=time)
-        if theta > 1:
-            theta = 1
-        elif theta < -1:
-            theta = -1
-            
-        dist = np.arccos(theta)    
+        dist = np.arccos(np.clip(theta, -1, 1))    
         
     return dist
     
@@ -101,7 +97,7 @@ def AmplitudePhaseDistance(x, f1, f2, **kwargs):
         dp : float
             Phase distance between the functions    
     """
-    time = x-min(x)/(max(x)-min(x))
+    time = (x-min(x))/(max(x)-min(x))
     SRSF = SquareRootSlopeFramework(time)
     q1 = SRSF.to_srsf(f1)
     q2 = SRSF.to_srsf(f2)
