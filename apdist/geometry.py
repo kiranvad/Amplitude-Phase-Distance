@@ -72,13 +72,12 @@ class SquareRootSlopeFramework:
                 
         Returns:
         ========
-            f_temp : numpy array of shape (n_domain, )
+            f_gamma : numpy array of shape (n_domain, )
                 Warped function 'f' with 'gam'         
         """ 
-        f_temp = np.interp((self.time[-1] - self.time[0]) * gam + self.time[0], 
-            self.time, f)
+        f_gamma = np.interp(gam, self.time, f)
 
-        return f_temp
+        return f_gamma
         
     def warp_q_gamma(self, q, gam):
         """Warp a function q with a gamma function
@@ -92,16 +91,15 @@ class SquareRootSlopeFramework:
                 
         Returns:
         ========
-            q_temp : numpy array of shape (n_domain, )
+            q_gamma : numpy array of shape (n_domain, )
                 Warped function 'q' with 'gam'         
         """ 
         gam_dev = np.gradient(gam, self.time)
-        tmp = np.interp((self.time[-1] - self.time[0]) * gam + self.time[0], 
-            self.time, q)
+        tmp = np.interp(gam, self.time, q)
 
-        q_temp = tmp * np.sqrt(gam_dev)
+        q_gamma = tmp * np.sqrt(gam_dev)
 
-        return q_temp
+        return q_gamma
         
     def get_gamma(self, q1, q2, **kwargs):
         """Compute warping function given two SRSFs
@@ -146,6 +144,8 @@ class SquareRootSlopeFramework:
             optimizer.solve(**default_kwargs)
 
             gamma = optimizer.gammaOpt
+            
+        gamma = (self.time[-1] - self.time[0]) * gamma + self.time[0]
             
         return gamma
 

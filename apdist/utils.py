@@ -14,7 +14,6 @@ def peak_plot2(x, y, ax, pk, curve, markers):
     return peaks
         
 def plot_warping(x, f1, f2, f2_gamma, gamma):
-    t = np.linspace(0,1, len(x))
     mosaic = "ABC;DBC"
     fig = plt.figure(figsize=(4*3*1.6, 4*1))
     fig.subplots_adjust(wspace=0.2, hspace=0.5)
@@ -37,11 +36,11 @@ def plot_warping(x, f1, f2, f2_gamma, gamma):
     axs['B'].fill_between(x, f1, f2_gamma, color='grey', alpha=0.5)
     axs['B'].legend()
     
-    t2q = interp1d(t,x)
+    gamma_x = (gamma)*(max(x)-min(x))+max(x)
     axs['C'].set_xlabel(r'$x$')
     axs['C'].set_ylabel(r'$x$')
     axs['C'].plot(x, x, label=r'$\Gamma_{I}$')    
-    axs['C'].plot(x, t2q(gamma), label=r'$\gamma^{*}$')
+    axs['C'].plot(x, gamma_x, label=r'$\gamma^{*}$')
     for i, p in enumerate(f1_peaks):
         if i==0:
             label = r"peaks $f_{r}$" 
@@ -54,8 +53,6 @@ def plot_warping(x, f1, f2, f2_gamma, gamma):
         axs[i].set_ylabel(r'$f(x)$')
         
     for i in ['B', 'C']:    
-        axs[i].legend(ncol=3,loc='upper center', 
-                  bbox_to_anchor=[0.5,1.2],
-                 )
+        axs[i].legend(ncol=3,loc='upper center', bbox_to_anchor=[0.5,1.2])
         
     return 
