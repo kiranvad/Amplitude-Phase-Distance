@@ -1,19 +1,5 @@
 import numpy as np
-
 from .geometry import *
-import pdb 
-
-def _grad(f, binsize):
-    n = f.shape[0]
-    g = np.zeros(n)
-    h = binsize*np.arange(1,n+1)
-    g[0] = (f[1] - f[0])/(h[1]-h[0])
-    g[-1] = (f[-1] - f[(-2)])/(h[-1]-h[-2])
-
-    h = h[2:]-h[0:-2]
-    g[1:-1] = (f[2:]-f[0:-2])/h[0]
-
-    return g
 
 def _amplitude_distance(time, q1, q2, gam):
     """ Compute Amplitude distance between two SRSF
@@ -36,15 +22,11 @@ def _amplitude_distance(time, q1, q2, gam):
     if delta.sum() == 0:
         dist = 0
     else:
-        M = len(time)
-        gam_dev = _grad(gam, 1 / np.double(M - 1))
-        tmp = np.interp((time[-1] - time[0]) * gam + time[0], time, q2)
+        gam_dev = np.gradient(gam, time)
+        q_gamma = np.interp(gam, time, q2)
+        y = (q1 - (q_gamma * np.sqrt(gam_dev))) ** 2
 
-        qw = tmp * np.sqrt(gam_dev)
-
-        y = (qw - q1) ** 2
-        tmp = np.diff(time)*(y[0:-1]+y[1:])/2
-        dist = np.sqrt(tmp.sum())
+        dist = np.sqrt(np.trapz(y, time))
        
     return dist
 
@@ -69,20 +51,19 @@ def _phase_distance(time, q1, q2, gam):
     if delta.sum() == 0:
         dist = 0
     else:
-        M = len(time)
-        gam_dev = _grad(gam, 1 / np.double(M - 1))
-        theta = np.trapz(np.sqrt(gam_dev),x=time)
+        gam_dev = np.gradient(gam, time)
+        theta = np.trapz(np.sqrt(gam_dev), x=time)
         dist = np.arccos(np.clip(theta, -1, 1))    
         
     return dist
     
-def AmplitudePhaseDistance(x, f1, f2, **kwargs):
+def AmplitudePhaseDistance(t, f1, f2, **kwargs):
     """ Compute Amplitude-Phase distance between two functions
     
     Parameters:
     ===========
-        x : numpy array of shape (n_domain, )
-            Discrete sampling of the domain    
+        t : numpy array of shape (n_domain, )
+            Discrete sampling of the domain maped to [0,1]   
         f1, f2 : numpy array of shape (n_domain, )
             Query and target one-dimensional functions 
             
@@ -97,14 +78,12 @@ def AmplitudePhaseDistance(x, f1, f2, **kwargs):
         dp : float
             Phase distance between the functions    
     """
-    time = (x-min(x))/(max(x)-min(x))
-    SRSF = SquareRootSlopeFramework(time)
+    SRSF = SquareRootSlopeFramework(t)
     q1 = SRSF.to_srsf(f1)
     q2 = SRSF.to_srsf(f2)
     gam = SRSF.get_gamma(q1, q2, **kwargs)            
-    gam = (gam - gam[0]) / (gam[-1] - gam[0])
     
-    dp = _phase_distance(time, q1, q2, gam)
-    da = _amplitude_distance(time, q1, q2, gam)
+    dp = _phase_distance(t, q1, q2, gam)
+    da = _amplitude_distance(t, q1, q2, gam)
 
     return da, dp
