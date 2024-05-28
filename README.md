@@ -15,6 +15,11 @@ pip install git+https://github.com/kiranvad/Amplitude-Phase-Distance.git
 pip install git+https://github.com/kiranvad/warping.git
 ```
 
+3. If you would like to use this function in PyTorch, install the following:
+```bash
+pip install git+https://github.com/kiranvad/funcshape.git
+```
+
 You should now be able to run the [example](/example.ipynb)
 
 
