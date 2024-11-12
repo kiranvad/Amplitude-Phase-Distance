@@ -36,7 +36,7 @@ def plot_warping(x, f1, f2, f2_gamma, gamma):
     axs['B'].fill_between(x, f1, f2_gamma, color='grey', alpha=0.5)
     axs['B'].legend()
     
-    gamma_x = (gamma)*(max(x)-min(x))+max(x)
+    gamma_x = ((gamma)*(max(x)-min(x)))+min(x)
     axs['C'].set_xlabel(r'$x$')
     axs['C'].set_ylabel(r'$x$')
     axs['C'].plot(x, x, label=r'$\Gamma_{I}$')    

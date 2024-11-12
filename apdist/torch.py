@@ -87,8 +87,9 @@ def AmplitudePhaseDistance(t : torch.Tensor,
     """
     f1 = Function(t, f1.reshape(-1,1))
     f2 = Function(t, f2.reshape(-1,1))
-    output = get_warping_function(f1, f2, **kwargs)           
-    
+    with torch.no_grad():
+        output = get_warping_function(f1, f2, **kwargs)           
+
     dp = _phase_distance(f1, f2, output[0])
     da = _amplitude_distance(f1, f2, output[0])
 
@@ -99,8 +100,9 @@ def plot_warping(x, f1, f2, output):
     warping = output[0]
     fig, axs =plt.subplots(1,3, figsize=(4*3, 4))
 
-    axs[0].plot(x, f1, label="ref")
-    axs[0].plot(x, f2, label="query")
+    axs[0].plot(x, f1, label="ref", color="k")
+    axs_twin = axs[0].twinx()
+    axs_twin.plot(x, f2, label="query", color="k", ls="--")
     time = torch.from_numpy((x-min(x))/(max(x)-min(x)))
     f2_ = Function(time, torch.from_numpy(f2).reshape(-1,1))
     axs[0].plot(x, f2_(warping.fx).squeeze(), color="k", label="aligned-query")
