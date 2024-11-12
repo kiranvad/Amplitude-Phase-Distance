@@ -1,6 +1,6 @@
 import numpy as np
 from scipy.interpolate import UnivariateSpline, interp1d
-from scipy.integrate import cumtrapz
+from scipy.integrate import cumulative_trapezoid as cumtrapz
 
 class SquareRootSlopeFramework:
     """Square Root Slope Framework (SRSF)
@@ -131,19 +131,8 @@ class SquareRootSlopeFramework:
                                         kwargs.pop("lambda", 0.0),
                                         kwargs.pop("grid_dim", 7)
                                         )
-        elif optim=="RLBFGS":
-            from .optim import rlbfgs
-
-            optimizer = rlbfgs(q1,self.time,q2)
-            default_kwargs = {"maxiter":30, 
-                              "verb":2, 
-                              "lam": 0, 
-                              "penalty": "roughness"
-                              }
-            default_kwargs.update(kwargs)
-            optimizer.solve(**default_kwargs)
-
-            gamma = optimizer.gammaOpt
+        else:
+            raise RuntimeError("Method %s for gamma optimization is not recognized"%optim)
             
         gamma = (self.time[-1] - self.time[0]) * gamma + self.time[0]
             
