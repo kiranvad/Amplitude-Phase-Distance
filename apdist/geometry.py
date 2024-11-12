@@ -1,6 +1,6 @@
 import numpy as np
 from scipy.interpolate import UnivariateSpline, interp1d
-from scipy.integrate import cumtrapz
+from scipy.integrate import cumulative_trapezoid as cumtrapz
 
 class SquareRootSlopeFramework:
     """Square Root Slope Framework (SRSF)

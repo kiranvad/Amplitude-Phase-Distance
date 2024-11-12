@@ -3,10 +3,11 @@
 requires installation of `funcshape` code from : https://github.com/kiranvad/funcshape
 """
 
-from funcshape.functions import Function, SRSF, get_warping_function, plot_function
+from funcshape.functions import Function, SRSF, get_warping_function
 import torch 
 import matplotlib.pyplot as plt
-from typing import List, Optional, Tuple, Union
+from typing import List, Union
+import pdb
 
 def _amplitude_distance(f1 : Function, f2 : Function, warping : Function)->torch.Tensor:
     """ Compute Phase distance between two functions given warping
@@ -31,9 +32,12 @@ def _amplitude_distance(f1 : Function, f2 : Function, warping : Function)->torch
         gam_dev = warping.derivative(warping.x)
         q_gamma = q2(warping.fx)
         y = (q1.qx.squeeze() - (q_gamma.squeeze() * torch.sqrt(gam_dev).squeeze())) ** 2
-
-        dist = torch.sqrt(torch.trapezoid(y, q1.x))
-       
+        integral = torch.trapezoid(y, q1.x)
+        print(integral)
+        if torch.isnan(integral):
+            pdb.set_trace()
+        dist = torch.sqrt(integral)
+        
     return dist
 
 def _phase_distance(f1 : Function, f2 : Function, warping : Function)->torch.Tensor:
@@ -57,6 +61,9 @@ def _phase_distance(f1 : Function, f2 : Function, warping : Function)->torch.Ten
     else:
         gam_dev = warping.derivative(warping.x)
         theta = torch.trapezoid(torch.sqrt(gam_dev).squeeze(), x=warping.x)
+        print(theta)
+        if torch.isnan(theta):
+            pdb.set_trace()
         dist = torch.arccos(torch.clamp(theta, -1, 1))    
         
     return dist
@@ -75,7 +82,7 @@ def AmplitudePhaseDistance(t : torch.Tensor,
             Query and target one-dimensional functions 
             
         kwargs : optional arguments for `get_gamma` function.
-            See geometry.SqaureRootSlopeFramework for more details
+            See get_warping_function in funcshape package for more details
               
             
     Returns:
