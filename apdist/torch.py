@@ -29,13 +29,10 @@ def _amplitude_distance(f1 : Function, f2 : Function, warping : Function)->torch
     if delta.sum() == 0:
         dist = 0
     else:
-        gam_dev = warping.derivative(warping.x)
+        gam_dev = torch.abs(warping.derivative(warping.x))
         q_gamma = q2(warping.fx)
         y = (q1.qx.squeeze() - (q_gamma.squeeze() * torch.sqrt(gam_dev).squeeze())) ** 2
         integral = torch.trapezoid(y, q1.x)
-        print(integral)
-        if torch.isnan(integral):
-            pdb.set_trace()
         dist = torch.sqrt(integral)
         
     return dist
@@ -59,11 +56,9 @@ def _phase_distance(f1 : Function, f2 : Function, warping : Function)->torch.Ten
     if delta.sum() == 0:
         dist = 0
     else:
-        gam_dev = warping.derivative(warping.x)
-        theta = torch.trapezoid(torch.sqrt(gam_dev).squeeze(), x=warping.x)
-        print(theta)
-        if torch.isnan(theta):
-            pdb.set_trace()
+        gam_dev = torch.abs(warping.derivative(warping.x))
+        integrand = torch.sqrt(gam_dev).squeeze()
+        theta = torch.trapezoid(integrand, x=warping.x)
         dist = torch.arccos(torch.clamp(theta, -1, 1))    
         
     return dist
@@ -107,12 +102,11 @@ def plot_warping(x, f1, f2, output):
     warping = output[0]
     fig, axs =plt.subplots(1,3, figsize=(4*3, 4))
 
-    axs[0].plot(x, f1, label="ref", color="k")
-    axs_twin = axs[0].twinx()
-    axs_twin.plot(x, f2, label="query", color="k", ls="--")
+    axs[0].plot(x, f1, label="ref", color="tab:blue")
+    axs[0].plot(x, f2, label="query", color="tab:orange", ls="--")
     time = torch.from_numpy((x-min(x))/(max(x)-min(x)))
     f2_ = Function(time, torch.from_numpy(f2).reshape(-1,1))
-    axs[0].plot(x, f2_(warping.fx).squeeze(), color="k", label="aligned-query")
+    axs[0].plot(x, f2_(warping.fx).squeeze(), color="tab:orange", label="aligned-query")
     axs[0].legend()
     axs[0].set(xlabel="x", ylabel="f(x)", title="Functions")
 
