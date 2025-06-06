@@ -1,0 +1,86 @@
+name: Code Quality
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  lint:
+    name: Linting and Code Quality
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+
+    - name: Cache pip dependencies
+      uses: actions/cache@v3
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-lint-${{ hashFiles('**/requirements*.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-lint-
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install flake8 black isort mypy
+        pip install -e .
+        pip install -r testing/requirements-test.txt
+
+    - name: Run Black (code formatting check)
+      run: |
+        black --check --diff apdist/
+        black --check --diff testing/tests/
+
+    - name: Run isort (import sorting check)
+      run: |
+        isort --check-only --diff apdist/
+        isort --check-only --diff testing/tests/
+
+    - name: Run flake8 (linting)
+      run: |
+        # Stop the build if there are Python syntax errors or undefined names
+        flake8 apdist/ --count --select=E9,F63,F7,F82 --show-source --statistics
+        # Exit-zero treats all errors as warnings. GitHub editor is 127 chars wide
+        flake8 apdist/ --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+
+    - name: Run mypy (type checking)
+      run: |
+        mypy apdist/ --ignore-missing-imports --no-strict-optional
+      continue-on-error: true  # Type checking is informational for now
+
+  security:
+    name: Security Scan
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+
+    - name: Install bandit
+      run: |
+        python -m pip install --upgrade pip
+        pip install bandit[toml]
+
+    - name: Run bandit security scan
+      run: |
+        bandit -r apdist/ -f json -o bandit-report.json
+      continue-on-error: true
+
+    - name: Upload bandit report
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: bandit-report
+        path: bandit-report.json

@@ -22,6 +22,23 @@ pip install git+https://github.com/kiranvad/funcshape.git
 
 You should now be able to run the [example](/example.ipynb)
 
+## Testing
+
+A comprehensive test suite is available in the `testing/` directory. To run tests:
+
+```bash
+# Quick verification (no dependencies required)
+cd testing && python test_basic_functionality.py
+
+# Full test suite (requires pytest)
+cd testing && python run_tests.py
+
+# Or using pytest directly
+cd testing && pytest tests/
+```
+
+For detailed testing instructions, see [`testing/TESTING_GUIDE.md`](testing/TESTING_GUIDE.md).
+
 
 ## Notes
 This package is intended to be used as a faster alternative to original works in [fdasrsf-python](https://github.com/jdtuck/fdasrsf_python).

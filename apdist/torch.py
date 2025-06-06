@@ -76,7 +76,7 @@ def AmplitudePhaseDistance(t : torch.Tensor,
         f1, f2 : numpy array of shape (n_domain, )
             Query and target one-dimensional functions 
             
-        kwargs : optional arguments for `get_gamma` function.
+        kwargs : optional arguments for `get_warping_function` function.
             See get_warping_function in funcshape package for more details
               
             
