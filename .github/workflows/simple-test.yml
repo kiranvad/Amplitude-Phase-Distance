@@ -1,0 +1,52 @@
+name: Simple Test
+
+on:
+  push:
+    branches: [ main, develop, funcshape ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+    
+    - name: Install basic dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install numpy scipy matplotlib
+    
+    - name: Install package
+      run: pip install -e .
+    
+    - name: Test basic functionality
+      run: |
+        cd testing
+        python test_basic_functionality.py
+    
+    - name: Test imports
+      run: |
+        python -c "import apdist; print('✅ Package imports successfully')"
+        python -c "from apdist import AmplitudePhaseDistance; print('✅ Main function imports successfully')"
+    
+    - name: Test simple computation
+      run: |
+        python -c "
+        import numpy as np
+        from apdist import AmplitudePhaseDistance
+        t = np.linspace(0, 1, 51)
+        f1 = np.sin(2 * np.pi * t)
+        f2 = np.sin(2 * np.pi * t + np.pi/4)
+        da, dp = AmplitudePhaseDistance(t, f1, f2)
+        print(f'✅ Distance computation works: da={da:.4f}, dp={dp:.4f}')
+        assert da >= 0 and dp >= 0
+        print('✅ All assertions passed')
+        "
