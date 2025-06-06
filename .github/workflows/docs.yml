@@ -25,6 +25,7 @@ jobs:
         pip install sphinx sphinx-rtd-theme sphinx-autodoc-typehints
         pip install -e .
         pip install -r testing/requirements-test.txt
+      continue-on-error: false
 
     - name: Create docs directory structure
       run: |
