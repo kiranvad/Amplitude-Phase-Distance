@@ -34,8 +34,8 @@ jobs:
     
     - name: Test imports
       run: |
-        python -c "import apdist; print('✅ Package imports successfully')"
-        python -c "from apdist import AmplitudePhaseDistance; print('✅ Main function imports successfully')"
+        python -c "import apdist; print('[SUCCESS] Package imports successfully')"
+        python -c "from apdist import AmplitudePhaseDistance; print('[SUCCESS] Main function imports successfully')"
     
     - name: Test simple computation
       run: |
@@ -46,7 +46,7 @@ jobs:
         f1 = np.sin(2 * np.pi * t)
         f2 = np.sin(2 * np.pi * t + np.pi/4)
         da, dp = AmplitudePhaseDistance(t, f1, f2)
-        print(f'✅ Distance computation works: da={da:.4f}, dp={dp:.4f}')
+        print(f'[SUCCESS] Distance computation works: da={da:.4f}, dp={dp:.4f}')
         assert da >= 0 and dp >= 0
-        print('✅ All assertions passed')
+        print('[SUCCESS] All assertions passed')
         "

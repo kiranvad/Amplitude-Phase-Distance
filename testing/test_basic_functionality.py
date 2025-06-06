@@ -14,10 +14,10 @@ def test_imports():
     try:
         from apdist.geometry import SquareRootSlopeFramework, WarpingManifold
         from apdist.distances import AmplitudePhaseDistance
-        print("✅ All core modules imported successfully")
+        print("[SUCCESS] All core modules imported successfully")
         return True
     except ImportError as e:
-        print(f"❌ Import error: {e}")
+        print(f"[FAILED] Import error: {e}")
         return False
 
 def test_basic_srsf():
@@ -37,10 +37,10 @@ def test_basic_srsf():
         assert np.all(np.isfinite(q))
         assert np.all(np.isfinite(f_rec))
         
-        print("✅ SRSF framework works correctly")
+        print("[SUCCESS] SRSF framework works correctly")
         return True
     except Exception as e:
-        print(f"❌ SRSF test failed: {e}")
+        print(f"[FAILED] SRSF test failed: {e}")
         return False
 
 def test_basic_distance():
@@ -62,10 +62,10 @@ def test_basic_distance():
         assert np.isfinite(da)
         assert np.isfinite(dp)
         
-        print(f"✅ Distance computation works: da={da:.4f}, dp={dp:.4f}")
+        print(f"[SUCCESS] Distance computation works: da={da:.4f}, dp={dp:.4f}")
         return True
     except Exception as e:
-        print(f"❌ Distance test failed: {e}")
+        print(f"[FAILED] Distance test failed: {e}")
         return False
 
 def test_identical_functions():
@@ -84,10 +84,10 @@ def test_identical_functions():
         assert da == 0.0
         assert dp == 0.0
         
-        print("✅ Identical functions give zero distance")
+        print("[SUCCESS] Identical functions give zero distance")
         return True
     except Exception as e:
-        print(f"❌ Identical functions test failed: {e}")
+        print(f"[FAILED] Identical functions test failed: {e}")
         return False
 
 def test_warping_manifold():
@@ -109,10 +109,10 @@ def test_warping_manifold():
         assert norm1 >= 0
         assert norm2 >= 0
         
-        print(f"✅ Warping manifold works: ip={ip:.4f}, norms=({norm1:.4f}, {norm2:.4f})")
+        print(f"[SUCCESS] Warping manifold works: ip={ip:.4f}, norms=({norm1:.4f}, {norm2:.4f})")
         return True
     except Exception as e:
-        print(f"❌ Warping manifold test failed: {e}")
+        print(f"[FAILED] Warping manifold test failed: {e}")
         return False
 
 def main():
@@ -137,17 +137,17 @@ def main():
             if test():
                 passed += 1
         except Exception as e:
-            print(f"❌ Test {test.__name__} failed with exception: {e}")
+            print(f"[FAILED] Test {test.__name__} failed with exception: {e}")
         print()
-    
+
     print("=" * 60)
     print(f"Results: {passed}/{total} tests passed")
-    
+
     if passed == total:
-        print("🎉 All basic tests passed! The package is working correctly.")
+        print("[SUCCESS] All basic tests passed! The package is working correctly.")
         return 0
     else:
-        print("⚠️  Some tests failed. Check the output above for details.")
+        print("[WARNING] Some tests failed. Check the output above for details.")
         return 1
 
 if __name__ == "__main__":
