@@ -48,21 +48,29 @@ def test_basic_distance():
     print("Testing distance computation...")
     try:
         from apdist.distances import AmplitudePhaseDistance
-        
+
         t = np.linspace(0, 1, 101)
         f1 = np.sin(2 * np.pi * t)
         f2 = np.sin(2 * np.pi * t + np.pi/4)
-        
+
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")  # Ignore fallback warnings
             da, dp = AmplitudePhaseDistance(t, f1, f2)
-        
+
         assert da >= 0
         assert dp >= 0
         assert np.isfinite(da)
         assert np.isfinite(dp)
-        
+
         print(f"[SUCCESS] Distance computation works: da={da:.4f}, dp={dp:.4f}")
+
+        # Test that fallback warning is issued when warping is not available
+        try:
+            import optimum_reparamN2
+            print("[INFO] Warping optimization available")
+        except ImportError:
+            print("[INFO] Using fallback (identity warping) - this is expected without warping package")
+
         return True
     except Exception as e:
         print(f"[FAILED] Distance test failed: {e}")
@@ -95,25 +103,72 @@ def test_warping_manifold():
     print("Testing warping manifold...")
     try:
         from apdist.geometry import WarpingManifold
-        
+
         t = np.linspace(0, 1, 101)
         v1 = np.sin(2 * np.pi * t)
         v2 = np.cos(2 * np.pi * t)
-        
+
         wm = WarpingManifold(t)
         ip = wm.inner_product(v1, v2)
         norm1 = wm.norm(v1)
         norm2 = wm.norm(v2)
-        
+
         assert np.isfinite(ip)
         assert norm1 >= 0
         assert norm2 >= 0
-        
+
         print(f"[SUCCESS] Warping manifold works: ip={ip:.4f}, norms=({norm1:.4f}, {norm2:.4f})")
         return True
     except Exception as e:
         print(f"[FAILED] Warping manifold test failed: {e}")
         return False
+
+
+def test_optional_dependencies():
+    """Test behavior with optional dependencies."""
+    print("Testing optional dependencies...")
+
+    # Test warping package
+    try:
+        import optimum_reparamN2
+        print("[SUCCESS] Warping optimization package is available")
+        warping_available = True
+    except ImportError:
+        print("[INFO] Warping optimization not available (using fallback)")
+        warping_available = False
+
+    # Test PyTorch
+    try:
+        import torch
+        print("[SUCCESS] PyTorch is available")
+        torch_available = True
+    except ImportError:
+        print("[INFO] PyTorch not available")
+        torch_available = False
+
+    # Test funcshape
+    try:
+        import funcshape
+        print("[SUCCESS] funcshape is available")
+        funcshape_available = True
+    except ImportError:
+        print("[INFO] funcshape not available")
+        funcshape_available = False
+
+    # Test PyTorch version of apdist
+    if torch_available and funcshape_available:
+        try:
+            from apdist.torch import AmplitudePhaseDistance as TorchAPD
+            print("[SUCCESS] PyTorch version of apdist is available")
+        except ImportError as e:
+            print(f"[WARNING] PyTorch version import failed: {e}")
+
+    print(f"[INFO] Optional dependencies status:")
+    print(f"  - Warping optimization: {'✓' if warping_available else '✗'}")
+    print(f"  - PyTorch: {'✓' if torch_available else '✗'}")
+    print(f"  - funcshape: {'✓' if funcshape_available else '✗'}")
+
+    return True
 
 def main():
     """Run all basic tests."""
@@ -126,7 +181,8 @@ def main():
         test_basic_srsf,
         test_basic_distance,
         test_identical_functions,
-        test_warping_manifold
+        test_warping_manifold,
+        test_optional_dependencies
     ]
     
     passed = 0

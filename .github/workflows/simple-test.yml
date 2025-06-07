@@ -31,6 +31,11 @@ jobs:
       run: |
         cd testing
         python test_basic_functionality.py
+
+    - name: Run core-only tests
+      run: |
+        cd testing
+        python -m pytest tests/test_core_only.py -v
     
     - name: Test imports
       run: |
