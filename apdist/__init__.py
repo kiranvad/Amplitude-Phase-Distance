@@ -6,10 +6,7 @@ A light-weight repository to compute Amplitude Phase distance between two functi
 
 from .distances import AmplitudePhaseDistance, _amplitude_distance, _phase_distance
 from .geometry import SquareRootSlopeFramework, WarpingManifold
-
-__version__ = "1.0"
-__author__ = "Kiran Vaddi"
-__email__ = "kiranvad@uw.edu"
+from ._version import __version__, __author__, __email__, __description__, __url__
 
 __all__ = [
     "AmplitudePhaseDistance",

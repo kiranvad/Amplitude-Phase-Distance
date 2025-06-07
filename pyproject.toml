@@ -30,11 +30,15 @@ dependencies = [
     "Cython",
     "cffi",
 ]
-dynamic = ["version"]
+version = "1.0.0"
 
 [project.optional-dependencies]
 torch = [
     "torch>=1.9.0",
+    "funcshape @ git+https://github.com/kiranvad/funcshape.git",
+]
+warping = [
+    "warping @ git+https://github.com/kiranvad/warping.git",
 ]
 dev = [
     "pytest>=6.0",
@@ -48,21 +52,27 @@ dev = [
     "sphinx-rtd-theme",
     "sphinx-autodoc-typehints",
 ]
+complete = [
+    "torch>=1.9.0",
+    "funcshape @ git+https://github.com/kiranvad/funcshape.git",
+    "warping @ git+https://github.com/kiranvad/warping.git",
+]
 all = [
-    "apdist[torch,dev]",
+    "apdist[complete,dev]",
 ]
 
 [project.urls]
 Homepage = "https://github.com/kiranvad/Amplitude-Phase-Distance"
 Repository = "https://github.com/kiranvad/Amplitude-Phase-Distance"
-Documentation = "https://kiranvad.github.io/Amplitude-Phase-Distance"
+Documentation = ""
 "Bug Tracker" = "https://github.com/kiranvad/Amplitude-Phase-Distance/issues"
 
 [tool.setuptools]
 packages = ["apdist"]
 
-[tool.setuptools_scm]
-write_to = "apdist/_version.py"
+# Removed setuptools_scm in favor of static versioning
+# [tool.setuptools_scm]
+# write_to = "apdist/_version.py"
 
 # Black configuration
 [tool.black]

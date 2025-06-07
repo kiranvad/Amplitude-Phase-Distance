@@ -3,21 +3,70 @@ A light-weight repository to compute Amplitude Phase distance between two functi
 
 ## Installation
 
-1. Installation of this package is done in two steps. First, install the package using the following:
+### Complete Installation (Recommended)
+
+Install everything you need in one command:
+
+```bash
+pip install "git+https://github.com/kiranvad/Amplitude-Phase-Distance.git[complete]"
+```
+
+This installs the main package plus all optional dependencies (PyTorch, funcshape, warping).
+
+### Basic Installation
 
 ```bash
 pip install git+https://github.com/kiranvad/Amplitude-Phase-Distance.git
 ```
 
-2. Now, install a Cython-based package called warping:
+### Selective Installation
 
+**With PyTorch support:**
 ```bash
-pip install git+https://github.com/kiranvad/warping.git
+pip install "git+https://github.com/kiranvad/Amplitude-Phase-Distance.git[torch]"
 ```
 
-3. If you would like to use this function in PyTorch, install the following:
+**With warping optimization:**
 ```bash
-pip install git+https://github.com/kiranvad/funcshape.git
+pip install "git+https://github.com/kiranvad/Amplitude-Phase-Distance.git[warping]"
+```
+
+**With development tools:**
+```bash
+pip install "git+https://github.com/kiranvad/Amplitude-Phase-Distance.git[dev]"
+```
+
+**Everything (complete + dev tools):**
+```bash
+pip install "git+https://github.com/kiranvad/Amplitude-Phase-Distance.git[all]"
+```
+
+### Development Installation
+
+```bash
+git clone https://github.com/kiranvad/Amplitude-Phase-Distance.git
+cd Amplitude-Phase-Distance
+pip install -e .
+```
+
+### Verify Installation
+
+```python
+import apdist
+print(f"apdist version: {apdist.__version__}")
+
+# Test basic functionality
+import numpy as np
+t = np.linspace(0, 1, 51)
+f1 = np.sin(2 * np.pi * t)
+f2 = np.sin(2 * np.pi * t + np.pi/4)
+da, dp = apdist.AmplitudePhaseDistance(t, f1, f2)
+print(f"Distance computation works: da={da:.4f}, dp={dp:.4f}")
+```
+
+Or run the included verification script:
+```bash
+python verify_installation.py
 ```
 
 You should now be able to run the [example](/example.ipynb)
@@ -70,4 +119,7 @@ Introduces shape-based clustering of Small-Angle X-ray Scattering (SAXS) data an
 ## Best practices for applying to your data
 1. Data-processing is needed as the methods used here are sensitive to data sampling. Theoretically, this should not be the case but in practice, we use techniques such as dynamic programming which works best if we have the unfirom sampling on the X-axis. This is often curcumvented by first fitting a spline to the data and using to make uniform samples. 
 
-2. There are two versions to compute the distance. The default numpy version is from the original `fda_srsf` package and is the fastet and should be prefered. The torch version is an attempt to alleviate some of the issues with the numpy version. While the actual definition of distances computed in both versions are the same, they differ in how they approximate the correct warping function. The numpy version using dynamic programing is a *discrete* approach to obtain the warping function. In the torch method, we instead solve for the warping function by performing an optimization on the function space of warping functions under a particular metric. The mathematical details can be found in [this](https://arxiv.org/abs/2207.11141) paper. Currently the torch version is experimental and is sometimes known to throw nan values for distances. If that happens, try to re-run the program and it should then be able to converge to a better solution.
+2. There are two versions to compute the distance. While the actual definition of distances computed in both versions are the same, they differ in how they approximate the correct warping function.:
+    a. The default numpy version is from the original `fda_srsf` package and is the fastet and should be prefered. The numpy version using dynamic programing is a *discrete* approach to obtain the warping function.
+    b. The torch version is an attempt to alleviate some of the issues with the numpy version. In the torch method, we instead solve for the warping function by performing an optimization on the function space of warping functions under a particular metric. The mathematical details can be found in [this](https://arxiv.org/abs/2207.11141) paper. We have observed that for in general torch and numpy version provide the same warping functions but the torch version is often better at warping complex functions with subtle features such as a small angle scattering curve in logspace. See this [notebook](/notebooks/01-saxs.ipynb) for more details.
+    c. The torch version is non-determinstic since it uses a gradient descent approach and thus require large number of random restarts to converge to a solution. This can be controlled by the `n_restarts` parameter in the `AmplitudePhaseDistance` function.

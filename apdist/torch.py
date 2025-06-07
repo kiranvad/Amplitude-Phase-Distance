@@ -29,7 +29,8 @@ def _amplitude_distance(f1 : Function, f2 : Function, warping : Function)->torch
     if delta.sum() == 0:
         dist = 0
     else:
-        gam_dev = torch.abs(warping.derivative(warping.x))
+        coordinates = (warping.x, )
+        gam_dev = torch.gradient(warping.fx.squeeze(), spacing=coordinates)[0].abs()
         q_gamma = q2(warping.fx)
         y = (q1.qx.squeeze() - (q_gamma.squeeze() * torch.sqrt(gam_dev).squeeze())) ** 2
         integral = torch.trapezoid(y, q1.x)
@@ -56,7 +57,8 @@ def _phase_distance(f1 : Function, f2 : Function, warping : Function)->torch.Ten
     if delta.sum() == 0:
         dist = 0
     else:
-        gam_dev = torch.abs(warping.derivative(warping.x))
+        coordinates = (warping.x, )
+        gam_dev = torch.gradient(warping.fx.squeeze(), spacing=coordinates)[0].abs()
         integrand = torch.sqrt(gam_dev).squeeze()
         theta = torch.trapezoid(integrand, x=warping.x)
         dist = torch.arccos(torch.clamp(theta, -1, 1))    

@@ -83,7 +83,6 @@ pytest --cov=apdist tests/       # With coverage
 ## Documentation
 
 - **[TESTING_GUIDE.md](TESTING_GUIDE.md)** - Comprehensive guide for running and writing tests
-- **[TEST_SUITE_SUMMARY.md](TEST_SUITE_SUMMARY.md)** - Summary of test suite structure and fixes
 - **[tests/README.md](tests/README.md)** - Detailed test documentation
 
 ## Dependencies
