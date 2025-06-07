@@ -1,0 +1,13 @@
+# Minimal requirements for CI/CD
+# This file excludes git-based dependencies that cause issues in CI
+
+# Core dependencies
+numpy>=1.18.1
+scipy
+matplotlib
+Cython
+cffi
+
+# Testing dependencies
+pytest>=6.0
+pytest-cov>=2.10

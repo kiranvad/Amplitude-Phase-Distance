@@ -25,7 +25,7 @@ jobs:
         pip install numpy scipy matplotlib
     
     - name: Install package
-      run: pip install -e .
+      run: pip install -e . --no-deps
     
     - name: Test basic functionality
       run: |

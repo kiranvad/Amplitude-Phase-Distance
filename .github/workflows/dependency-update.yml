@@ -58,8 +58,9 @@ jobs:
     - name: Test with updated dependencies
       if: env.UPDATES_AVAILABLE == 'true'
       run: |
-        pip install -e .
-        pip install -r testing/requirements-test.txt
+        pip install numpy scipy matplotlib
+        pip install -e . --no-deps
+        pip install pytest pytest-cov
         cd testing
         python test_basic_functionality.py
 
@@ -107,7 +108,7 @@ jobs:
 
     - name: Run security audit
       run: |
-        pip install -r testing/requirements-test.txt
+        pip install numpy scipy matplotlib pytest pytest-cov
         safety check --json --output safety-report.json
       continue-on-error: true
 
