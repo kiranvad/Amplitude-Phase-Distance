@@ -1,0 +1,21 @@
+# Core testing dependencies
+pytest>=6.0
+pytest-cov>=2.10
+
+# Core package dependencies (should match setup.py)
+numpy>=1.18.1
+scipy
+matplotlib
+
+# Optional dependencies for full functionality
+# Uncomment these lines if you want to test PyTorch functionality:
+# torch>=1.9.0
+# git+https://github.com/kiranvad/funcshape.git
+
+# Optional dependency for warping optimization
+# Uncomment this line for full warping functionality:
+# git+https://github.com/kiranvad/warping.git
+
+# Development dependencies
+Cython
+cffi
