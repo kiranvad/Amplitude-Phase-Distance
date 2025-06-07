@@ -22,7 +22,6 @@ jobs:
         python -m pip install --upgrade pip
         pip install sphinx sphinx-rtd-theme sphinx-autodoc-typehints
         pip install numpy scipy matplotlib
-        pip install -e . --no-deps
       continue-on-error: false
 
     - name: Create docs directory structure

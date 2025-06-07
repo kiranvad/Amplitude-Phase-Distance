@@ -32,7 +32,6 @@ jobs:
         python -m pip install --upgrade pip
         pip install flake8 black isort mypy
         pip install numpy scipy matplotlib
-        pip install -e . --no-deps
       continue-on-error: true
 
     - name: Run Black (code formatting check)

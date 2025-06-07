@@ -27,10 +27,8 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install pytest-benchmark
+        pip install pytest-benchmark pytest pytest-cov
         pip install numpy scipy matplotlib
-        pip install -e . --no-deps
-        pip install pytest pytest-cov
 
     - name: Create benchmark tests
       run: |
@@ -44,6 +42,7 @@ jobs:
         
         import pytest
         import numpy as np
+        import sys; sys.path.insert(0, '.')
         from apdist import AmplitudePhaseDistance, SquareRootSlopeFramework
         
         
