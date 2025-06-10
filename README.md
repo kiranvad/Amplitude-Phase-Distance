@@ -61,7 +61,7 @@ da, dp = apdist.AmplitudePhaseDistance(t, f1, f2)
 print(f"Distance computation works: da={da:.4f}, dp={dp:.4f}")
 ```
 
-You should now be able to run the [example](/example.ipynb)
+You should now be able to run the [example](/example.ipynb). See [notebooks](/notebooks/) for more examples relevant to materials science applications.
 
 ## Testing
 
