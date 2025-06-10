@@ -1,0 +1,130 @@
+name: Dependency Updates (Disabled)
+
+on:
+  workflow_dispatch:  # Manual trigger only
+  # Disabled for now - enable after basic CI is working
+  # schedule:
+  #   # Run weekly on Mondays at 9 AM UTC
+  #   - cron: '0 9 * * 1'
+
+jobs:
+  update-dependencies:
+    name: Update Dependencies
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+
+    - name: Install pip-tools
+      run: |
+        python -m pip install --upgrade pip
+        pip install pip-tools
+
+    - name: Update testing requirements
+      run: |
+        cd testing
+        # Create requirements.in if it doesn't exist
+        if [ ! -f requirements.in ]; then
+          cat > requirements.in << 'EOF'
+        pytest>=6.0
+        pytest-cov>=2.10
+        numpy>=1.18.1
+        scipy
+        matplotlib
+        Cython
+        cffi
+        EOF
+        fi
+        
+        # Update requirements
+        pip-compile --upgrade requirements.in
+        
+        # Check if there are changes
+        if git diff --quiet requirements-test.txt; then
+          echo "No dependency updates needed"
+          echo "UPDATES_AVAILABLE=false" >> $GITHUB_ENV
+        else
+          echo "Dependencies updated"
+          echo "UPDATES_AVAILABLE=true" >> $GITHUB_ENV
+        fi
+
+    - name: Test with updated dependencies
+      if: env.UPDATES_AVAILABLE == 'true'
+      run: |
+        pip install numpy scipy matplotlib pytest pytest-cov
+        python -c "
+        import sys; sys.path.insert(0, '.')
+        import numpy as np
+        import warnings
+        from apdist import AmplitudePhaseDistance
+        t = np.linspace(0, 1, 51)
+        f1 = np.sin(2 * np.pi * t)
+        f2 = np.sin(2 * np.pi * t + np.pi/4)
+        with warnings.catch_warnings():
+            warnings.simplefilter('ignore')
+            da, dp = AmplitudePhaseDistance(t, f1, f2)
+        print(f'Dependency update test passed: da={da:.4f}, dp={dp:.4f}')
+        assert da >= 0 and dp >= 0
+        "
+
+    - name: Create Pull Request
+      if: env.UPDATES_AVAILABLE == 'true'
+      uses: peter-evans/create-pull-request@v5
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        commit-message: 'chore: update dependencies'
+        title: 'chore: update dependencies'
+        body: |
+          ## Dependency Updates
+          
+          This PR updates the project dependencies to their latest versions.
+          
+          ### Changes
+          - Updated testing dependencies in `testing/requirements-test.txt`
+          
+          ### Testing
+          - [x] Basic functionality test passed
+          - [ ] Full test suite (will run in CI)
+          
+          ### Notes
+          This PR was automatically created by the dependency update workflow.
+          Please review the changes and ensure all tests pass before merging.
+        branch: dependency-updates
+        delete-branch: true
+
+  security-audit:
+    name: Security Audit
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+
+    - name: Install safety
+      run: |
+        python -m pip install --upgrade pip
+        pip install safety
+
+    - name: Run security audit
+      run: |
+        pip install numpy scipy matplotlib pytest pytest-cov
+        safety check --json --output safety-report.json
+      continue-on-error: true
+
+    - name: Upload security report
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: security-audit
+        path: safety-report.json

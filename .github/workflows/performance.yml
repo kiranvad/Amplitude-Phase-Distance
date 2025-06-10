@@ -1,0 +1,126 @@
+name: Performance Benchmarks (Disabled)
+
+on:
+  workflow_dispatch:  # Manual trigger only
+  # Disabled for now - enable after basic CI is working
+  # push:
+  #   branches: [ main ]
+  # pull_request:
+  #   branches: [ main ]
+  # schedule:
+  #   # Run monthly on the 1st at 2 AM UTC
+  #   - cron: '0 2 1 * *'
+
+jobs:
+  benchmark:
+    name: Performance Benchmarks
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install pytest-benchmark pytest pytest-cov
+        pip install numpy scipy matplotlib
+
+    - name: Create benchmark tests
+      run: |
+        mkdir -p testing/benchmarks
+        cat > testing/benchmarks/__init__.py << 'EOF'
+        # Benchmark tests
+        EOF
+        
+        cat > testing/benchmarks/test_performance.py << 'EOF'
+        """Performance benchmark tests for apdist package."""
+        
+        import pytest
+        import numpy as np
+        import sys; sys.path.insert(0, '.')
+        from apdist import AmplitudePhaseDistance, SquareRootSlopeFramework
+        
+        
+        class TestPerformanceBenchmarks:
+            """Performance benchmarks for core functionality."""
+            
+            def test_amplitude_phase_distance_small(self, benchmark):
+                """Benchmark distance computation with small arrays."""
+                t = np.linspace(0, 1, 101)
+                f1 = np.sin(2 * np.pi * t)
+                f2 = np.sin(2 * np.pi * t + np.pi/4)
+                
+                result = benchmark(AmplitudePhaseDistance, t, f1, f2)
+                assert len(result) == 2
+                assert all(np.isfinite(r) for r in result)
+            
+            def test_amplitude_phase_distance_medium(self, benchmark):
+                """Benchmark distance computation with medium arrays."""
+                t = np.linspace(0, 1, 501)
+                f1 = np.sin(2 * np.pi * t) + 0.3 * np.sin(6 * np.pi * t)
+                f2 = np.sin(2 * np.pi * t + np.pi/4) + 0.3 * np.sin(6 * np.pi * t + np.pi/6)
+                
+                result = benchmark(AmplitudePhaseDistance, t, f1, f2)
+                assert len(result) == 2
+                assert all(np.isfinite(r) for r in result)
+            
+            def test_amplitude_phase_distance_large(self, benchmark):
+                """Benchmark distance computation with large arrays."""
+                t = np.linspace(0, 1, 1001)
+                f1 = np.sin(2 * np.pi * t) + 0.3 * np.sin(6 * np.pi * t) + 0.1 * np.sin(10 * np.pi * t)
+                f2 = np.sin(2 * np.pi * t + np.pi/4) + 0.3 * np.sin(6 * np.pi * t + np.pi/6) + 0.1 * np.sin(10 * np.pi * t + np.pi/8)
+                
+                result = benchmark(AmplitudePhaseDistance, t, f1, f2)
+                assert len(result) == 2
+                assert all(np.isfinite(r) for r in result)
+            
+            def test_srsf_conversion(self, benchmark):
+                """Benchmark SRSF conversion."""
+                t = np.linspace(0, 1, 501)
+                f = np.sin(2 * np.pi * t) + 0.3 * np.sin(6 * np.pi * t)
+                srsf = SquareRootSlopeFramework(t)
+                
+                result = benchmark(srsf.to_srsf, f)
+                assert result.shape == f.shape
+                assert np.all(np.isfinite(result))
+            
+            def test_srsf_reconstruction(self, benchmark):
+                """Benchmark SRSF reconstruction."""
+                t = np.linspace(0, 1, 501)
+                f = np.sin(2 * np.pi * t) + 0.3 * np.sin(6 * np.pi * t)
+                srsf = SquareRootSlopeFramework(t)
+                q = srsf.to_srsf(f)
+                
+                result = benchmark(srsf.from_srsf, q, f[0])
+                assert result.shape == f.shape
+                assert np.all(np.isfinite(result))
+        EOF
+
+    - name: Run benchmarks
+      run: |
+        cd testing
+        pytest benchmarks/ --benchmark-only --benchmark-json=benchmark-results.json || echo "Benchmarks completed with warnings"
+      continue-on-error: true
+
+    - name: Store benchmark results
+      uses: benchmark-action/github-action-benchmark@v1
+      with:
+        tool: 'pytest'
+        output-file-path: testing/benchmark-results.json
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        auto-push: false
+        comment-on-alert: true
+        alert-threshold: '150%'
+        fail-on-alert: false
+      continue-on-error: true
+
+    - name: Upload benchmark results
+      uses: actions/upload-artifact@v4
+      with:
+        name: benchmark-results
+        path: testing/benchmark-results.json

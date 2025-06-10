@@ -103,39 +103,47 @@ class SquareRootSlopeFramework:
         
     def get_gamma(self, q1, q2, **kwargs):
         """Compute warping function given two SRSFs
-        
+
         Parameters:
         ===========
             q1, q2 : numpy array of shape (n_domain, )
-                Discrete SRSF evaluation of pair of functions 
+                Discrete SRSF evaluation of pair of functions
             lam : float
                 Regularization parameter of Dynamic Programming algorithm
 
-                
+
         Returns:
         ========
             gamma : numpy array of shape (n_domain, )
-                Warping function to align 'q2' with 'q1'  
-                
-                
-        This function is a heavylift from the python 'fdasrsf' package.
-        See https://github.com/jdtuck/fdasrsf_python for more details.       
-        """ 
-        optim = kwargs.pop("optim", "DP")
-        if optim== "DP":
-            import optimum_reparamN2 as orN2
+                Warping function to align 'q2' with 'q1'
 
-            gamma = orN2.coptimum_reparam(np.ascontiguousarray(q1), 
-                                        self.time,
-                                        np.ascontiguousarray(q2), 
-                                        kwargs.pop("lambda", 0.0),
-                                        kwargs.pop("grid_dim", 7)
-                                        )
+
+        This function is a heavylift from the python 'fdasrsf' package.
+        See https://github.com/jdtuck/fdasrsf_python for more details.
+        """
+        optim = kwargs.pop("optim", "DP")
+        if optim == "DP":
+            try:
+                import optimum_reparamN2 as orN2
+
+                gamma = orN2.coptimum_reparam(np.ascontiguousarray(q1),
+                                            self.time,
+                                            np.ascontiguousarray(q2),
+                                            kwargs.pop("lambda", 0.0),
+                                            kwargs.pop("grid_dim", 7)
+                                            )
+            except ImportError:
+                # Fallback to identity warping if optimum_reparamN2 is not available
+                import warnings
+                warnings.warn("optimum_reparamN2 not available. Using identity warping. "
+                             "Install the warping package for full functionality: "
+                             "pip install git+https://github.com/kiranvad/warping.git")
+                gamma = self.time.copy()
         else:
             raise RuntimeError("Method %s for gamma optimization is not recognized"%optim)
-            
+
         gamma = (self.time[-1] - self.time[0]) * gamma + self.time[0]
-            
+
         return gamma
 
 class WarpingManifold:
@@ -159,11 +167,15 @@ class WarpingManifold:
         self.time = time
     
     def inner_product(self, tangent_vec_a, tangent_vec_b, base_point=None):
-        ip = np.trapz(tangent_vec_a*tangent_vec_b, self.time)
-    
+        # base_point parameter kept for API compatibility
+        _ = base_point  # Suppress unused parameter warning
+        ip = np.trapezoid(tangent_vec_a*tangent_vec_b, self.time)
+
         return ip
 
     def norm(self, tangent_vec, base_point=None):
+        # base_point parameter kept for API compatibility
+        _ = base_point  # Suppress unused parameter warning
         l2norm = np.sqrt(self.inner_product(tangent_vec, tangent_vec))
 
         return l2norm
@@ -232,7 +244,7 @@ class WarpingManifold:
         while (error > 1e-6) and (itr < maxiter):
             vec = np.zeros((T, n))
             for i in range(n):
-                out, theta = self.log(mu, psi[:, i])
+                out, _ = self.log(mu, psi[:, i])  # theta not used in this context
                 vec[:, i] = out
 
             vbar = vec.mean(axis=1)

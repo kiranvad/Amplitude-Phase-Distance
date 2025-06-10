@@ -7,9 +7,8 @@ from funcshape.functions import Function, SRSF, get_warping_function
 import torch 
 import matplotlib.pyplot as plt
 from typing import List, Union
-import pdb
 
-def _amplitude_distance(f1 : Function, f2 : Function, warping : Function)->torch.Tensor:
+def torch_amplitude_distance(f1 : Function, f2 : Function, warping : Function)->torch.Tensor:
     """ Compute Phase distance between two functions given warping
     
     Parameters:
@@ -26,18 +25,20 @@ def _amplitude_distance(f1 : Function, f2 : Function, warping : Function)->torch
     """
     q1, q2 = SRSF(f1), SRSF(f2)
     delta = q1.qx-q2.qx
-    if delta.sum() == 0:
-        dist = 0
+    if delta.sum().item() == 0.0:
+        print("Functions are idential...")
+        dist = torch.tensor(0.0)
     else:
-        gam_dev = torch.abs(warping.derivative(warping.x))
+        coordinates = (warping.x, )
+        gam_dev = torch.gradient(warping.fx.squeeze(), spacing=coordinates)[0].abs()
         q_gamma = q2(warping.fx)
         y = (q1.qx.squeeze() - (q_gamma.squeeze() * torch.sqrt(gam_dev).squeeze())) ** 2
         integral = torch.trapezoid(y, q1.x)
         dist = torch.sqrt(integral)
         
-    return dist
+    return dist.to(f1.fx.device)
 
-def _phase_distance(f1 : Function, f2 : Function, warping : Function)->torch.Tensor:
+def torch_phase_distance(f1 : Function, f2 : Function, warping : Function)->torch.Tensor:
     """ Compute Phase distance between two functions given warping
     
     Parameters:
@@ -54,16 +55,17 @@ def _phase_distance(f1 : Function, f2 : Function, warping : Function)->torch.Ten
     """
     delta = f1.fx-f2.fx
     if delta.sum() == 0:
-        dist = 0
+        dist = torch.tensor(0.0)
     else:
-        gam_dev = torch.abs(warping.derivative(warping.x))
+        coordinates = (warping.x, )
+        gam_dev = torch.gradient(warping.fx.squeeze(), spacing=coordinates)[0].abs()
         integrand = torch.sqrt(gam_dev).squeeze()
         theta = torch.trapezoid(integrand, x=warping.x)
         dist = torch.arccos(torch.clamp(theta, -1, 1))    
         
-    return dist
+    return dist.to(f1.fx.device)
     
-def AmplitudePhaseDistance(t : torch.Tensor, 
+def TorchAmplitudePhaseDistance(t : torch.Tensor, 
                            f1: torch.Tensor, 
                            f2: torch.Tensor, 
                            **kwargs)->Union[torch.Tensor, torch.Tensor, List]:
@@ -76,7 +78,7 @@ def AmplitudePhaseDistance(t : torch.Tensor,
         f1, f2 : numpy array of shape (n_domain, )
             Query and target one-dimensional functions 
             
-        kwargs : optional arguments for `get_gamma` function.
+        kwargs : optional arguments for `get_warping_function` function.
             See get_warping_function in funcshape package for more details
               
             
@@ -92,8 +94,8 @@ def AmplitudePhaseDistance(t : torch.Tensor,
     with torch.no_grad():
         output = get_warping_function(f1, f2, **kwargs)           
 
-    dp = _phase_distance(f1, f2, output[0])
-    da = _amplitude_distance(f1, f2, output[0])
+    dp = torch_phase_distance(f1, f2, output[0])
+    da = torch_amplitude_distance(f1, f2, output[0])
 
     return da, dp, output
 

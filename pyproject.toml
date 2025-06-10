@@ -1,0 +1,163 @@
+[build-system]
+requires = ["setuptools>=45", "wheel", "setuptools_scm[toml]>=6.2"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "apdist"
+description = "Amplitude-Phase distance between functions"
+readme = "README.md"
+license = {text = "MIT"}
+authors = [
+    {name = "Kiran Vaddi", email = "kiranvad@uw.edu"},
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Topic :: Scientific/Engineering :: Mathematics",
+    "Operating System :: OS Independent",
+]
+requires-python = ">=3.8"
+dependencies = [
+    "numpy>=1.18.1",
+    "scipy",
+    "matplotlib",
+    "Cython",
+    "cffi",
+    "torch>=1.9.0",
+    "funcshape @ git+https://github.com/kiranvad/funcshape.git",
+    "warping @ git+https://github.com/kiranvad/warping.git",
+]
+version = "1.0.0"
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=6.0",
+    "pytest-cov>=2.10",
+    "black",
+    "isort",
+    "flake8",
+    "mypy",
+    "pre-commit",
+    "sphinx",
+    "sphinx-rtd-theme",
+    "sphinx-autodoc-typehints",
+]
+all = [
+    "apdist[dev]",
+]
+
+[project.urls]
+Homepage = "https://github.com/kiranvad/Amplitude-Phase-Distance"
+Repository = "https://github.com/kiranvad/Amplitude-Phase-Distance"
+Documentation = "https://github.com/kiranvad/Amplitude-Phase-Distance"
+"Bug Tracker" = "https://github.com/kiranvad/Amplitude-Phase-Distance/issues"
+
+[tool.setuptools]
+packages = ["apdist"]
+
+# Removed setuptools_scm in favor of static versioning
+# [tool.setuptools_scm]
+# write_to = "apdist/_version.py"
+
+# Black configuration
+[tool.black]
+line-length = 127
+target-version = ['py38', 'py39', 'py310', 'py311']
+include = '\.pyi?$'
+extend-exclude = '''
+/(
+  # directories
+  \.eggs
+  | \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | build
+  | dist
+)/
+'''
+
+# isort configuration
+[tool.isort]
+profile = "black"
+line_length = 127
+multi_line_output = 3
+include_trailing_comma = true
+force_grid_wrap = 0
+use_parentheses = true
+ensure_newline_before_comments = true
+
+# pytest configuration
+[tool.pytest.ini_options]
+testpaths = ["testing/tests"]
+python_files = "test_*.py"
+python_classes = "Test*"
+python_functions = "test_*"
+addopts = [
+    "-v",
+    "--tb=short",
+    "--strict-markers",
+    "--disable-warnings",
+]
+markers = [
+    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+    "integration: marks tests as integration tests",
+    "torch: marks tests that require PyTorch dependencies",
+]
+
+# Coverage configuration
+[tool.coverage.run]
+source = ["apdist"]
+omit = [
+    "*/tests/*",
+    "*/testing/*",
+    "*/__pycache__/*",
+    "*/build/*",
+    "*/dist/*",
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "if self.debug:",
+    "if settings.DEBUG",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if 0:",
+    "if __name__ == .__main__.:",
+    "class .*\\bProtocol\\):",
+    "@(abc\\.)?abstractmethod",
+]
+
+# MyPy configuration
+[tool.mypy]
+python_version = "3.8"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = false
+disallow_incomplete_defs = false
+check_untyped_defs = true
+disallow_untyped_decorators = false
+no_implicit_optional = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_no_return = true
+warn_unreachable = true
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = [
+    "scipy.*",
+    "matplotlib.*",
+    "optimum_reparamN2",
+    "funcshape.*",
+]
+ignore_missing_imports = true
