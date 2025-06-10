@@ -31,8 +31,8 @@ jobs:
     - name: Test imports
       run: |
         python -c "import apdist; print('[SUCCESS] Package imports successfully')"
-        python -c "from apdist import AmplitudePhaseDistance; print('[SUCCESS] Main function imports successfully')"
-        python -c "from apdist.torch import AmplitudePhaseDistance as TorchAPD; print('[SUCCESS] PyTorch version imports successfully')"
+        python -c "from apdist.distances import AmplitudePhaseDistance; print('[SUCCESS] Main function imports successfully')"
+        python -c "from apdist.torch import TorchAmplitudePhaseDistance as TorchAPD; print('[SUCCESS] PyTorch version imports successfully')"
 
     - name: Test basic functionality
       run: |
