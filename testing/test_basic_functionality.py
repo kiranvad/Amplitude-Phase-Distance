@@ -154,7 +154,7 @@ def test_all_dependencies():
 
     # Test PyTorch version of apdist
     try:
-        from apdist.torch import AmplitudePhaseDistance as TorchAPD
+        from apdist.torch import TorchAmplitudePhaseDistance as TorchAPD
         print("[SUCCESS] PyTorch version of apdist is available")
     except ImportError as e:
         print(f"[FAILED] PyTorch version import failed: {e}")
