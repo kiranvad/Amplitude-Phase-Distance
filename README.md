@@ -43,7 +43,7 @@ pip install -e .
 ### Verify Installation
 
 ```python
-import apdist
+from apdist.distances import AmplitudePhaseDistance
 print(f"apdist version: {apdist.__version__}")
 
 # Test basic functionality
@@ -51,7 +51,7 @@ import numpy as np
 t = np.linspace(0, 1, 51)
 f1 = np.sin(2 * np.pi * t)
 f2 = np.sin(2 * np.pi * t + np.pi/4)
-da, dp = apdist.AmplitudePhaseDistance(t, f1, f2)
+da, dp = AmplitudePhaseDistance(t, f1, f2)
 print(f"Distance computation works: da={da:.4f}, dp={dp:.4f}")
 ```
 
@@ -111,7 +111,7 @@ Introduces shape-based clustering of Small-Angle X-ray Scattering (SAXS) data an
 
    b. The torch version is an attempt to alleviate some of the issues with the numpy version. In the torch method, we instead solve for the warping function by performing an optimization on the function space of warping functions under a particular metric. The mathematical details can be found in [this](https://arxiv.org/abs/2207.11141) paper. We have observed that in general torch and numpy version provide the same warping functions but the torch version is often better at warping complex functions with subtle features such as a small angle scattering curve in logspace. See this [notebook](/notebooks/01-saxs.ipynb) for more details.
 
-   c. The torch version is non-deterministic since it uses a gradient descent approach and thus requires a large number of random restarts to converge to a solution. This can be controlled by the `n_restarts` parameter in the `AmplitudePhaseDistance` function.
+   c. The torch version is non-deterministic since it uses a gradient descent approach and thus requires a large number of random restarts to converge to a solution. This can be controlled by the `n_restarts` parameter in the `AmplitudePhaseDistance` function. Note that you can not use this function directly as a loss function in a deep learning pipeline since it involves training a neural network training as an inner loop thus we do not track gradients when computing the distance.
 
 ## Project Status
 
@@ -122,8 +122,6 @@ The badges at the top of this README provide quick information about the project
 - **Python Version**: Minimum Python version required
 - **License**: Open source license type
 - **Code Style**: Automated code formatting standard
-- **Issues**: Number of open issues and bug reports
-- **Stars/Forks**: Community engagement metrics
 
 ## Contributing
 
