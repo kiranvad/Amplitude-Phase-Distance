@@ -1,10 +1,7 @@
 """Tests for PyTorch implementation in apdist.torch module."""
-import pytest
-import numpy as np
 import torch
 from funcshape.functions import Function
-from apdist.torch import _amplitude_distance, _phase_distance, AmplitudePhaseDistance, plot_warping
-import matplotlib.pyplot as plt
+from apdist.torch import *
 
 optim_kwargs = {"n_iters":1, 
                 "n_basis":5, 
@@ -30,7 +27,7 @@ class TestTorchAmplitudeDistance:
         f2 = Function(t, f_vals.reshape(-1, 1))
         warping = Function(t, t.reshape(-1, 1))  # Identity warping
         
-        dist = _amplitude_distance(f1, f2, warping)
+        dist = torch_amplitude_distance(f1, f2, warping)
 
         assert torch.equal(dist, torch.tensor(0.0))
     
@@ -44,7 +41,7 @@ class TestTorchAmplitudeDistance:
         f2 = Function(t, f2_vals.reshape(-1, 1))
         warping = Function(t, t.reshape(-1, 1))  # Identity warping
         
-        dist = _amplitude_distance(f1, f2, warping)
+        dist = torch_amplitude_distance(f1, f2, warping)
         
         assert dist > 0
         assert torch.isfinite(dist)
@@ -61,7 +58,7 @@ class TestTorchPhaseDistance:
         f2 = Function(t, f_vals.reshape(-1, 1))
         warping = Function(t, t.reshape(-1, 1))  # Identity warping
         
-        dist = _phase_distance(f1, f2, warping)
+        dist = torch_phase_distance(f1, f2, warping)
         
         assert torch.equal(dist, torch.tensor(0.0))
     
@@ -75,7 +72,7 @@ class TestTorchPhaseDistance:
         f2 = Function(t, f2_vals.reshape(-1, 1))
         warping = Function(t, t.reshape(-1, 1))
         
-        dist = _phase_distance(f1, f2, warping)
+        dist = torch_phase_distance(f1, f2, warping)
         
         assert dist >= 0
         assert dist <= torch.pi
@@ -89,7 +86,7 @@ class TestTorchAmplitudePhaseDistance:
         t = torch.linspace(0, 1, 101)
         f = torch.sin(2 * torch.pi * t)
         
-        da, dp, output = AmplitudePhaseDistance(t, f, f.clone(), **optim_kwargs)
+        da, dp, output = TorchAmplitudePhaseDistance(t, f, f.clone(), **optim_kwargs)
         
         assert da==0.0
         assert dp==0.0
@@ -101,7 +98,7 @@ class TestTorchAmplitudePhaseDistance:
         f1 = torch.sin(2 * torch.pi * t)
         f2 = torch.sin(2 * torch.pi * t + torch.pi/4)
         
-        da, dp, output = AmplitudePhaseDistance(t, f1, f2, **optim_kwargs)
+        da, dp, output = TorchAmplitudePhaseDistance(t, f1, f2, **optim_kwargs)
         
         assert da >= 0
         assert dp >= 0
@@ -114,7 +111,7 @@ class TestTorchAmplitudePhaseDistance:
         f1 = torch.sin(2 * torch.pi * t)
         f2 = torch.sin(2 * torch.pi * t + torch.pi/4)
         
-        da, dp, output = AmplitudePhaseDistance(t, f1, f2, **optim_kwargs)
+        da, dp, output = TorchAmplitudePhaseDistance(t, f1, f2, **optim_kwargs)
         
         assert isinstance(da, torch.Tensor)
         assert isinstance(dp, torch.Tensor)
@@ -129,7 +126,7 @@ class TestTorchEdgeCases:
         f1 = torch.ones_like(t)
         f2 = torch.ones_like(t) * 2
         
-        da, dp, output = AmplitudePhaseDistance(t, f1, f2, **optim_kwargs)
+        da, dp, output = TorchAmplitudePhaseDistance(t, f1, f2, **optim_kwargs)
         
         assert torch.isfinite(da)
         assert torch.isfinite(dp)
@@ -140,7 +137,7 @@ class TestTorchEdgeCases:
         f1 = t
         f2 = 2 * t + 1
         
-        da, dp, output = AmplitudePhaseDistance(t, f1, f2, **optim_kwargs)
+        da, dp, output = TorchAmplitudePhaseDistance(t, f1, f2, **optim_kwargs)
         
         assert torch.isfinite(da)
         assert torch.isfinite(dp)
@@ -151,7 +148,7 @@ class TestTorchEdgeCases:
         f1 = 1e-10 * torch.sin(2 * torch.pi * t)
         f2 = 1e-10 * torch.sin(2 * torch.pi * t + torch.pi/4)
         
-        da, dp, output = AmplitudePhaseDistance(t, f1, f2, **optim_kwargs)
+        da, dp, output = TorchAmplitudePhaseDistance(t, f1, f2, **optim_kwargs)
         
         assert torch.isfinite(da)
         assert torch.isfinite(dp)
@@ -162,7 +159,7 @@ class TestTorchEdgeCases:
         f1 = 1e6 * torch.sin(2 * torch.pi * t)
         f2 = 1e6 * torch.sin(2 * torch.pi * t + torch.pi/4)
         
-        da, dp, output = AmplitudePhaseDistance(t, f1, f2, **optim_kwargs)
+        da, dp, output = TorchAmplitudePhaseDistance(t, f1, f2, **optim_kwargs)
         
         assert torch.isfinite(da)
         assert torch.isfinite(dp)

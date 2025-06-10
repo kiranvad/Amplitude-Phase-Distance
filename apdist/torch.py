@@ -7,9 +7,8 @@ from funcshape.functions import Function, SRSF, get_warping_function
 import torch 
 import matplotlib.pyplot as plt
 from typing import List, Union
-import pdb 
 
-def _amplitude_distance(f1 : Function, f2 : Function, warping : Function)->torch.Tensor:
+def torch_amplitude_distance(f1 : Function, f2 : Function, warping : Function)->torch.Tensor:
     """ Compute Phase distance between two functions given warping
     
     Parameters:
@@ -39,7 +38,7 @@ def _amplitude_distance(f1 : Function, f2 : Function, warping : Function)->torch
         
     return dist.to(f1.fx.device)
 
-def _phase_distance(f1 : Function, f2 : Function, warping : Function)->torch.Tensor:
+def torch_phase_distance(f1 : Function, f2 : Function, warping : Function)->torch.Tensor:
     """ Compute Phase distance between two functions given warping
     
     Parameters:
@@ -66,7 +65,7 @@ def _phase_distance(f1 : Function, f2 : Function, warping : Function)->torch.Ten
         
     return dist.to(f1.fx.device)
     
-def AmplitudePhaseDistance(t : torch.Tensor, 
+def TorchAmplitudePhaseDistance(t : torch.Tensor, 
                            f1: torch.Tensor, 
                            f2: torch.Tensor, 
                            **kwargs)->Union[torch.Tensor, torch.Tensor, List]:
@@ -95,8 +94,8 @@ def AmplitudePhaseDistance(t : torch.Tensor,
     with torch.no_grad():
         output = get_warping_function(f1, f2, **kwargs)           
 
-    dp = _phase_distance(f1, f2, output[0])
-    da = _amplitude_distance(f1, f2, output[0])
+    dp = torch_phase_distance(f1, f2, output[0])
+    da = torch_amplitude_distance(f1, f2, output[0])
 
     return da, dp, output
 
