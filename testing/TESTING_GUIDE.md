@@ -75,33 +75,8 @@ xdg-open htmlcov/index.html  # Linux
 | `test_basic.py` | Core functionality without external deps | numpy, scipy |
 | `test_distances.py` | Distance computation tests | numpy, scipy |
 | `test_geometry.py` | SRSF and manifold tests | numpy, scipy |
-| `test_utils.py` | Visualization utilities | matplotlib |
 | `test_torch.py` | PyTorch implementation | torch, funcshape |
-| `test_integration.py` | End-to-end workflows | All above |
 
-## Common Issues and Solutions
-
-### Issue: "optimum_reparamN2 not available" warning
-**Solution**: This is expected. The package falls back to identity warping. To get full functionality:
-```bash
-pip install git+https://github.com/kiranvad/warping.git
-```
-
-### Issue: PyTorch tests skipped
-**Solution**: Install PyTorch dependencies:
-```bash
-pip install torch
-pip install git+https://github.com/kiranvad/funcshape.git
-```
-
-### Issue: Plotting tests fail in headless environment
-**Solution**: This is expected in environments without display. Tests will skip automatically.
-
-### Issue: "ModuleNotFoundError" for pytest
-**Solution**: Install pytest:
-```bash
-pip install pytest
-```
 
 ## Writing New Tests
 
@@ -111,14 +86,7 @@ pip install pytest
 - SRSF/Manifold → `test_geometry.py`
 - Plotting → `test_utils.py`
 - PyTorch → `test_torch.py`
-- Workflows → `test_integration.py`
 
-### 2. Use Appropriate Markers
-```python
-@pytest.mark.slow          # For long-running tests
-@pytest.mark.torch         # For PyTorch-dependent tests
-@pytest.mark.integration   # For end-to-end tests
-```
 
 ## Continuous Integration
 

@@ -4,7 +4,6 @@ import pytest
 import numpy as np
 from apdist.distances import _amplitude_distance, _phase_distance, AmplitudePhaseDistance
 
-
 class TestAmplitudeDistance:
     """Test amplitude distance computation."""
     
@@ -100,7 +99,6 @@ class TestPhaseDistance:
         
         dist = _phase_distance(t, q1, q2, gam)
         assert dist <= np.pi
-
 
 class TestAmplitudePhaseDistance:
     """Test the main AmplitudePhaseDistance function."""

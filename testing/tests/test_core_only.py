@@ -150,65 +150,6 @@ class TestCoreWithoutOptionalDeps:
                     assert np.isfinite(da), f"Non-finite amplitude distance for functions {i}, {j}"
                     assert np.isfinite(dp), f"Non-finite phase distance for functions {i}, {j}"
 
-
-class TestOptionalDependencyHandling:
-    """Test that optional dependencies are handled gracefully."""
-    
-    def test_warping_package_optional(self):
-        """Test that warping package is truly optional."""
-        # This test verifies the package works without optimum_reparamN2
-        try:
-            import optimum_reparamN2
-            pytest.skip("Warping package is available, cannot test fallback")
-        except ImportError:
-            # Good, warping package is not available
-            pass
-        
-        # Test that distance computation still works
-        t = np.linspace(0, 1, 51)
-        f1 = np.sin(2 * np.pi * t)
-        f2 = np.sin(2 * np.pi * t + np.pi/4)
-        
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore")
-            da, dp = AmplitudePhaseDistance(t, f1, f2)
-        
-        assert da >= 0
-        assert dp >= 0
-    
-    def test_torch_package_optional(self):
-        """Test that torch package is truly optional."""
-        # Test that the main package works without torch
-        try:
-            import torch
-            pytest.skip("PyTorch is available, cannot test without it")
-        except ImportError:
-            # Good, torch is not available
-            pass
-        
-        # Test that main functionality still works
-        t = np.linspace(0, 1, 51)
-        f1 = np.sin(2 * np.pi * t)
-        f2 = np.sin(2 * np.pi * t + np.pi/4)
-        
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore")
-            da, dp = AmplitudePhaseDistance(t, f1, f2)
-        
-        assert da >= 0
-        assert dp >= 0
-    
-    def test_torch_module_import_fails_gracefully(self):
-        """Test that torch module import fails gracefully when dependencies missing."""
-        try:
-            from apdist.torch import AmplitudePhaseDistance as TorchAPD
-            # If this succeeds, torch dependencies are available
-            pytest.skip("PyTorch dependencies available, cannot test import failure")
-        except ImportError:
-            # This is expected when torch/funcshape are not available
-            assert True  # Test passes if import fails gracefully
-
-
 class TestNumericalStability:
     """Test numerical stability with core functionality only."""
     

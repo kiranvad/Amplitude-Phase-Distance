@@ -17,24 +17,15 @@ setup(name="apdist",
       license='MIT',
       python_requires='>=3.8',
       install_requires=['numpy>=1.18.1',
-                        'scipy', 
-                        'matplotlib', 
-                        'Cython', 
-                        'cffi'
+                        'scipy',
+                        'matplotlib',
+                        'Cython',
+                        'cffi',
+                        'torch>=1.9.0',
+                        'funcshape @ git+https://github.com/kiranvad/funcshape.git',
+                        'warping @ git+https://github.com/kiranvad/warping.git'
                         ],
       extras_require = {
-          'torch': [
-              'torch>=1.9.0',
-              'funcshape @ git+https://github.com/kiranvad/funcshape.git',
-          ],
-          'warping': [
-              'warping @ git+https://github.com/kiranvad/warping.git',
-          ],
-          'complete': [
-              'torch>=1.9.0',
-              'funcshape @ git+https://github.com/kiranvad/funcshape.git',
-              'warping @ git+https://github.com/kiranvad/warping.git',
-          ],
           'dev': [
               'pytest>=6.0',
               'pytest-cov>=2.10',
@@ -44,9 +35,6 @@ setup(name="apdist",
               'mypy',
           ],
           'all': [
-              'torch>=1.9.0',
-              'funcshape @ git+https://github.com/kiranvad/funcshape.git',
-              'warping @ git+https://github.com/kiranvad/warping.git',
               'pytest>=6.0',
               'pytest-cov>=2.10',
               'black',

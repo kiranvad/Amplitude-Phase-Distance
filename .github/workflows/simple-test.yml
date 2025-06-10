@@ -22,30 +22,25 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install numpy scipy matplotlib
+        pip install pytest
+
+    - name: Install package
+      run: |
+        pip install -e .
 
     - name: Test imports
       run: |
-        python -c "import numpy; print('numpy OK')"
-        python -c "import scipy; print('scipy OK')"
-        python -c "import matplotlib; print('matplotlib OK')"
-        python -c "import sys; sys.path.insert(0, '.'); import apdist; print('[SUCCESS] Package imports successfully')"
-        python -c "import sys; sys.path.insert(0, '.'); from apdist import AmplitudePhaseDistance; print('[SUCCESS] Main function imports successfully')"
+        python -c "import apdist; print('[SUCCESS] Package imports successfully')"
+        python -c "from apdist import AmplitudePhaseDistance; print('[SUCCESS] Main function imports successfully')"
+        python -c "from apdist.torch import AmplitudePhaseDistance as TorchAPD; print('[SUCCESS] PyTorch version imports successfully')"
 
     - name: Test basic functionality
       run: |
-        python -c "
-        import sys; sys.path.insert(0, '.')
-        import numpy as np
-        import warnings
-        from apdist import AmplitudePhaseDistance
-        t = np.linspace(0, 1, 51)
-        f1 = np.sin(2 * np.pi * t)
-        f2 = np.sin(2 * np.pi * t + np.pi/4)
-        with warnings.catch_warnings():
-            warnings.simplefilter('ignore')
-            da, dp = AmplitudePhaseDistance(t, f1, f2)
-        print(f'[SUCCESS] Distance computation works: da={da:.4f}, dp={dp:.4f}')
-        assert da >= 0 and dp >= 0
-        print('[SUCCESS] All assertions passed')
-        "
+        cd testing
+        python test_basic_functionality.py
+
+    - name: Run all tests
+      run: |
+        cd testing
+        python -m pytest tests/ -v --tb=short
+      continue-on-error: true

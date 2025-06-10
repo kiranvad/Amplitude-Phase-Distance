@@ -124,50 +124,43 @@ def test_warping_manifold():
         return False
 
 
-def test_optional_dependencies():
-    """Test behavior with optional dependencies."""
-    print("Testing optional dependencies...")
+def test_all_dependencies():
+    """Test that all required dependencies are available."""
+    print("Testing required dependencies...")
 
     # Test warping package
     try:
         import optimum_reparamN2
         print("[SUCCESS] Warping optimization package is available")
-        warping_available = True
     except ImportError:
-        print("[INFO] Warping optimization not available (using fallback)")
-        warping_available = False
+        print("[FAILED] Warping optimization not available")
+        return False
 
     # Test PyTorch
     try:
         import torch
         print("[SUCCESS] PyTorch is available")
-        torch_available = True
     except ImportError:
-        print("[INFO] PyTorch not available")
-        torch_available = False
+        print("[FAILED] PyTorch not available")
+        return False
 
     # Test funcshape
     try:
         import funcshape
         print("[SUCCESS] funcshape is available")
-        funcshape_available = True
     except ImportError:
-        print("[INFO] funcshape not available")
-        funcshape_available = False
+        print("[FAILED] funcshape not available")
+        return False
 
     # Test PyTorch version of apdist
-    if torch_available and funcshape_available:
-        try:
-            from apdist.torch import AmplitudePhaseDistance as TorchAPD
-            print("[SUCCESS] PyTorch version of apdist is available")
-        except ImportError as e:
-            print(f"[WARNING] PyTorch version import failed: {e}")
+    try:
+        from apdist.torch import AmplitudePhaseDistance as TorchAPD
+        print("[SUCCESS] PyTorch version of apdist is available")
+    except ImportError as e:
+        print(f"[FAILED] PyTorch version import failed: {e}")
+        return False
 
-    print(f"[INFO] Optional dependencies status:")
-    print(f"  - Warping optimization: {'✓' if warping_available else '✗'}")
-    print(f"  - PyTorch: {'✓' if torch_available else '✗'}")
-    print(f"  - funcshape: {'✓' if funcshape_available else '✗'}")
-
+    print("[SUCCESS] All required dependencies are available")
     return True
 
 def main():
@@ -182,7 +175,7 @@ def main():
         test_basic_distance,
         test_identical_functions,
         test_warping_manifold,
-        test_optional_dependencies
+        test_all_dependencies
     ]
     
     passed = 0

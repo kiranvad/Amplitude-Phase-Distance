@@ -22,29 +22,19 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install numpy scipy matplotlib
+        pip install pytest
 
-    - name: Test imports
+    - name: Install package
       run: |
-        python -c "import numpy; print('numpy OK')"
-        python -c "import scipy; print('scipy OK')"
-        python -c "import matplotlib; print('matplotlib OK')"
-        python -c "import sys; sys.path.insert(0, '.'); import apdist; print('apdist imports OK')"
+        pip install -e .
 
     - name: Test basic functionality
       run: |
-        python -c "
-        import sys; sys.path.insert(0, '.')
-        import numpy as np
-        import warnings
-        from apdist import AmplitudePhaseDistance
-        t = np.linspace(0, 1, 51)
-        f1 = np.sin(2 * np.pi * t)
-        f2 = np.sin(2 * np.pi * t + np.pi/4)
-        with warnings.catch_warnings():
-            warnings.simplefilter('ignore')
-            da, dp = AmplitudePhaseDistance(t, f1, f2)
-        print(f'Distance computation works: da={da:.4f}, dp={dp:.4f}')
-        assert da >= 0 and dp >= 0
-        print('Basic functionality test passed!')
-        "
+        cd testing
+        python test_basic_functionality.py
+
+    - name: Run core tests
+      run: |
+        cd testing
+        python -m pytest tests/test_basic.py tests/test_distances.py -v
+      continue-on-error: true

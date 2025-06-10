@@ -29,17 +29,13 @@ dependencies = [
     "matplotlib",
     "Cython",
     "cffi",
+    "torch>=1.9.0",
+    "funcshape @ git+https://github.com/kiranvad/funcshape.git",
+    "warping @ git+https://github.com/kiranvad/warping.git",
 ]
 version = "1.0.0"
 
 [project.optional-dependencies]
-torch = [
-    "torch>=1.9.0",
-    "funcshape @ git+https://github.com/kiranvad/funcshape.git",
-]
-warping = [
-    "warping @ git+https://github.com/kiranvad/warping.git",
-]
 dev = [
     "pytest>=6.0",
     "pytest-cov>=2.10",
@@ -52,19 +48,14 @@ dev = [
     "sphinx-rtd-theme",
     "sphinx-autodoc-typehints",
 ]
-complete = [
-    "torch>=1.9.0",
-    "funcshape @ git+https://github.com/kiranvad/funcshape.git",
-    "warping @ git+https://github.com/kiranvad/warping.git",
-]
 all = [
-    "apdist[complete,dev]",
+    "apdist[dev]",
 ]
 
 [project.urls]
 Homepage = "https://github.com/kiranvad/Amplitude-Phase-Distance"
 Repository = "https://github.com/kiranvad/Amplitude-Phase-Distance"
-Documentation = ""
+Documentation = "https://github.com/kiranvad/Amplitude-Phase-Distance"
 "Bug Tracker" = "https://github.com/kiranvad/Amplitude-Phase-Distance/issues"
 
 [tool.setuptools]
