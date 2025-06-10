@@ -10,11 +10,6 @@
 [![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-<!-- Community and Usage -->
-[![GitHub issues](https://img.shields.io/github/issues/kiranvad/Amplitude-Phase-Distance)](https://github.com/kiranvad/Amplitude-Phase-Distance/issues)
-[![GitHub stars](https://img.shields.io/github/stars/kiranvad/Amplitude-Phase-Distance)](https://github.com/kiranvad/Amplitude-Phase-Distance/stargazers)
-[![GitHub forks](https://img.shields.io/github/forks/kiranvad/Amplitude-Phase-Distance)](https://github.com/kiranvad/Amplitude-Phase-Distance/network)
-
 A light-weight repository to compute Amplitude Phase distance between two functions.
 
 ## Features

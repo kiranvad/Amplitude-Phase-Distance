@@ -53,9 +53,6 @@ testing/
 
 ### Quick Commands
 ```bash
-# Basic verification
-python test_basic_functionality.py
-
 # All tests
 python run_tests.py
 
