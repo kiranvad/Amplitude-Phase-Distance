@@ -169,7 +169,7 @@ class WarpingManifold:
     def inner_product(self, tangent_vec_a, tangent_vec_b, base_point=None):
         # base_point parameter kept for API compatibility
         _ = base_point  # Suppress unused parameter warning
-        ip = np.trapezoid(tangent_vec_a*tangent_vec_b, self.time)
+        ip = np.trapz(tangent_vec_a*tangent_vec_b, self.time)
 
         return ip
 

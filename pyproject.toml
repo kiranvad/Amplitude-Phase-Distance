@@ -30,8 +30,8 @@ dependencies = [
     "Cython",
     "cffi",
     "torch>=1.9.0",
-    "funcshape @ git+https://github.com/kiranvad/funcshape.git",
-    "warping @ git+https://github.com/kiranvad/warping.git",
+    "funcshape @ git+https://github.com/kiranvad/funcshape.git@v1.0",
+    "warping @ git+https://github.com/kiranvad/warping.git@v1.0.0",
 ]
 version = "1.0.0"
 
