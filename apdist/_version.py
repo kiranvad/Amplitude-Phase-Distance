@@ -1,6 +1,6 @@
 # Version information for apdist package
-__version__ = "1.0.0"
-__version_info__ = (1, 0, 0)
+__version__ = "1.0.1"
+__version_info__ = (1, 0, 1)
 
 # Package metadata
 __author__ = "Kiran Vaddi"
