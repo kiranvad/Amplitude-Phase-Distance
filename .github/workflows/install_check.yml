@@ -22,10 +22,10 @@ jobs:
 
       - run: pip install .
 
-      - run: python -c "import from apdist.distances import AmplitudePhaseDistance"
+      - run: python -c "from apdist.distances import AmplitudePhaseDistance"
 
       - run: python -m build
 
       - run: pip install dist/*.whl
 
-      - run: python -c "import from apdist.distances import AmplitudePhaseDistance"
+      - run: python -c "from apdist.distances import AmplitudePhaseDistance"
