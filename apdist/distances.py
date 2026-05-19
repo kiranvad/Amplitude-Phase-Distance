@@ -26,7 +26,7 @@ def _amplitude_distance(time, q1, q2, gam):
         q_gamma = np.interp(gam, time, q2)
         y = (q1 - (q_gamma * np.sqrt(gam_dev))) ** 2
 
-        dist = np.sqrt(np.trapz(y, time))
+        dist = np.sqrt(np.trapezoid(y, time))
        
     return dist
 
@@ -52,7 +52,7 @@ def _phase_distance(time, q1, q2, gam):
         dist = 0
     else:
         gam_dev = np.gradient(gam, time)
-        theta = np.trapz(np.sqrt(gam_dev), x=time)
+        theta = np.trapezoid(np.sqrt(gam_dev), x=time)
         dist = np.arccos(np.clip(theta, -1, 1))    
         
     return dist
