@@ -4,9 +4,12 @@ import os
 # Import version from _version.py
 def get_version():
     version_file = os.path.join(os.path.dirname(__file__), 'apdist', '_version.py')
+    # Use an explicit namespace: since Python 3.13 (PEP 667), exec() inside a
+    # function no longer updates the dict returned by a later locals() call.
+    namespace = {}
     with open(version_file) as f:
-        exec(f.read())
-    return locals()['__version__']
+        exec(f.read(), namespace)
+    return namespace['__version__']
 
 setup(name="apdist",
       description="Amplitude-Phase distance between functions",
