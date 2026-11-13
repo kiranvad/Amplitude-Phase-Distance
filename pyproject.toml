@@ -1,29 +1,31 @@
 [build-system]
-requires = ["setuptools>=45", "wheel", "setuptools_scm[toml]>=6.2"]
+requires = ["setuptools>=77", "setuptools-scm>=8"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "apdist"
 description = "Amplitude-Phase distance between functions"
 readme = "README.md"
-license = {text = "MIT"}
+license = "MIT"
+license-files = ["LICENSE"]
 authors = [
     {name = "Kiran Vaddi", email = "kiranvad@uw.edu"},
 ]
 classifiers = [
     "Development Status :: 4 - Beta",
     "Intended Audience :: Science/Research",
-    "License :: OSI Approved :: MIT License",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
     "Topic :: Scientific/Engineering :: Mathematics",
     "Operating System :: OS Independent",
 ]
 requires-python = ">=3.9"
+dynamic = ["version"]
 dependencies = [
     "numpy>=1.18.1",
     "scipy",
@@ -34,7 +36,6 @@ dependencies = [
     "funcshape @ git+https://github.com/kiranvad/funcshape.git@v1.0",
     "warping @ git+https://github.com/kiranvad/warping.git@v1.0.0",
 ]
-version = "1.0.0"
 
 [project.optional-dependencies]
 dev = [
@@ -62,9 +63,11 @@ Documentation = "https://github.com/kiranvad/Amplitude-Phase-Distance"
 [tool.setuptools]
 packages = ["apdist"]
 
-# Removed setuptools_scm in favor of static versioning
-# [tool.setuptools_scm]
-# write_to = "apdist/_version.py"
+# Version is derived from git tags (e.g. v1.2.3) at build time.
+# Untagged commits get a dev version such as 1.2.4.dev3+g1a2b3c4.
+[tool.setuptools_scm]
+version_file = "apdist/_version.py"
+fallback_version = "0.0.0"
 
 # Black configuration
 [tool.black]

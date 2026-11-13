@@ -18,5 +18,4 @@ ignore:
   - "testing/"
   - "notebooks/"
   - "docs/"
-  - "setup.py"
   - "apdist/_version.py"

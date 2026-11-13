@@ -4,10 +4,6 @@ include LICENSE
 include CHANGELOG.md
 include CONTRIBUTING.md
 include pyproject.toml
-include setup.py
-
-# Include version file
-include apdist/_version.py
 
 # Include example notebook and verification script
 include example.ipynb

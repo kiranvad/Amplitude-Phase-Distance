@@ -264,11 +264,18 @@ sphinx-build -b html source build/html
 
 Releases are handled by maintainers:
 
-1. Update version in `setup.py` and `apdist/__init__.py`
-2. Update CHANGELOG.md
-3. Create a git tag: `git tag v1.x.x`
-4. Push tag: `git push origin v1.x.x`
-5. GitHub Actions will automatically create a release
+The package version is derived automatically from git tags by
+[setuptools-scm](https://setuptools-scm.readthedocs.io/) — there is no version
+number to edit by hand.
+
+1. Update CHANGELOG.md
+2. Create a git tag: `git tag v1.x.x`
+3. Push tag: `git push origin v1.x.x`
+4. GitHub Actions will automatically create a release
+
+Builds from untagged commits get a development version such as
+`1.x.(x+1).devN+g<hash>`. Check the version that will be built with
+`python -m setuptools_scm`.
 
 ## Getting Help
 
